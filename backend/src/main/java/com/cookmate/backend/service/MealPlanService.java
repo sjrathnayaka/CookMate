@@ -1,6 +1,7 @@
 package com.cookmate.backend.service;
 import com.cookmate.backend.model.MealPlan;
 import java.util.List;
+
 public interface MealPlanService {
     MealPlan createMealPlan(MealPlan mealPlan);
     List<MealPlan> getUserMealPlans(String userId);
