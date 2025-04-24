@@ -1,0 +1,203 @@
+/* styles/mealplan.css */
+.meal-plans-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #FFF8F0; /* Cream/Vanilla primary */
+    color: #333;
+  }
+  
+  .create-button {
+    background-color: #E86A57; /* Rusty Tomato secondary */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .meal-plan-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input,
+  .form-group .react-datepicker-wrapper {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .meal-plan-view {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .day-plans-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  /* Add more styles for DayPlan, MealSlot, etc. */
+
+  /* Add to mealplan.css */
+
+.day-plan {
+    background-color: #FFF8F0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .meal-slot {
+    background-color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .meal-slot.editable {
+    border: 2px dashed #E86A57;
+  }
+  
+  .meal-slot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .meal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .recipe-status {
+    color: #FFB400;
+    font-weight: bold;
+  }
+  
+  .no-recipe {
+    color: #999;
+    font-style: italic;
+  }
+  
+  .mark-tried {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .mark-tried input {
+    flex-grow: 1;
+    padding: 5px;
+  }
+  
+  .mark-tried button {
+    background-color: #FFB400;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .meal-plan-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .meal-plan-list li {
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .meal-plan-list li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  /* Recipe Selector Modal */
+  .recipe-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    float: right;
+  }
+  
+  .recipe-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .recipe-item {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .recipe-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .recipe-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
