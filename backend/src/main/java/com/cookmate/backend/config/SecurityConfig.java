@@ -1,21 +1,22 @@
 package com.cookmate.backend.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration; // <- Add this
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration // <- This is required to tell Spring to load this config
+@Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
-            );
+            )
+            .csrf(csrf -> csrf.disable()); // ✅ New lambda-style config for csrf
+
         return http.build();
     }
 }
