@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MealPlanList from '../components/mealplan/MealPlanList';
 import MealPlanForm from '../components/mealplan/MealPlanForm';
 import mealPlanService from '../services/mealPlanService';
+import MealPlanView from '../components/mealplan/MealPlanView';
 import '../styles/mealplan.css';
 
 const MealPlansPage = ({ userId }) => {

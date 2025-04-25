@@ -1,4 +1,3 @@
-// components/mealplan/MealPlanForm.jsx
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -9,6 +8,8 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
     startDate: new Date(),
     endDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000) // Default 7-day plan
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,14 +19,27 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
     setFormData({ ...formData, [field]: date });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      startDate: formData.startDate.toISOString().split('T')[0],
-      endDate: formData.endDate.toISOString().split('T')[0],
-      dayPlans: generateDayPlans(formData.startDate, formData.endDate)
-    });
+    setError(null);
+    setIsSubmitting(true);
+    
+    try {
+      const mealPlanPayload = {
+        ...formData,
+        startDate: formData.startDate.toISOString().split('T')[0],
+        endDate: formData.endDate.toISOString().split('T')[0],
+        dayPlans: generateDayPlans(formData.startDate, formData.endDate)
+      };
+      
+      console.log('Submitting meal plan:', mealPlanPayload); // Debug log
+      await onSubmit(mealPlanPayload);
+    } catch (err) {
+      console.error('Submission failed:', err);
+      setError(err.message || 'Failed to create meal plan');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const generateDayPlans = (startDate, endDate) => {
@@ -50,6 +64,7 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
   return (
     <div className="meal-plan-form">
       <h3>Create New Meal Plan</h3>
+      {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Plan Name</label>
@@ -59,6 +74,7 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
             value={formData.name}
             onChange={handleChange}
             required
+            disabled={isSubmitting}
           />
         </div>
         
@@ -69,6 +85,7 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
             onChange={(date) => handleDateChange(date, 'startDate')}
             minDate={new Date()}
             required
+            disabled={isSubmitting}
           />
         </div>
         
@@ -79,12 +96,24 @@ const MealPlanForm = ({ onSubmit, onCancel }) => {
             onChange={(date) => handleDateChange(date, 'endDate')}
             minDate={formData.startDate}
             required
+            disabled={isSubmitting}
           />
         </div>
         
         <div className="form-actions">
-          <button type="button" onClick={onCancel}>Cancel</button>
-          <button type="submit">Create Plan</button>
+          <button 
+            type="button" 
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Plan'}
+          </button>
         </div>
       </form>
     </div>
