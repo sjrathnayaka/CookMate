@@ -9,7 +9,7 @@ const RecipeForm = () => {
     cuisine: "",
     difficulty: "",
     cookingTime: "",
-    userId: "test-user-id", // Replace with logged-in user if needed
+    userId: "test-user-id", // Replace with actual user ID if needed
   });
 
   const [file, setFile] = useState(null);
@@ -23,29 +23,54 @@ const RecipeForm = () => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-
-    formData.append(
-      "recipe",
-      new Blob([
-        JSON.stringify({
-          ...recipe,
-          ingredients: recipe.ingredients.split(",").map((item) => item.trim()),
-        }),
-      ], { type: "application/json" })
-    );
-
-    if (file) {
-      formData.append("file", file);
-    }
-
     try {
-      const res = await axios.post("http://localhost:8081/api/recipes", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const formData = new FormData();
+
+      formData.append(
+        "recipe",
+        new Blob(
+          [
+            JSON.stringify({
+              ...recipe,
+              ingredients: recipe.ingredients
+                .split(",")
+                .map((item) => item.trim()),
+            }),
+          ],
+          { type: "application/json" }
+        )
+      );
+
+      if (file) {
+        formData.append("file", file);
+      }
+
+      // 🔑 Get token from localStorage (or wherever you're storing it)
+      const token = localStorage.getItem("token"); 
+
+      // ⚠️ Optional: Handle case where token is missing
+      if (!token) {
+        alert("You need to be logged in to submit a recipe.");
+        setLoading(false);
+        return;
+      }
+
+      // 📨 Send request with JWT token in the Authorization header
+      const response = await axios.post(
+        "http://localhost:8081/api/recipes",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       alert("✅ Recipe uploaded successfully!");
-      console.log("Uploaded:", res.data);
-      // Optional: clear form
+      console.log("Uploaded:", response.data);
+
+      // Reset form
       setRecipe({
         title: "",
         ingredients: "",
@@ -56,8 +81,8 @@ const RecipeForm = () => {
         userId: "test-user-id",
       });
       setFile(null);
-    } catch (err) {
-      console.error("Upload failed:", err);
+    } catch (error) {
+      console.error("Upload failed:", error);
       alert("❌ Upload failed. Please try again.");
     } finally {
       setLoading(false);
@@ -65,67 +90,135 @@ const RecipeForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4 space-y-4">
-      <input
-        type="text"
-        name="title"
-        value={recipe.title}
-        onChange={handleChange}
-        placeholder="Title"
-        className="w-full p-2 border rounded"
-        required
-      />
-      <input
-        type="text"
-        name="ingredients"
-        value={recipe.ingredients}
-        onChange={handleChange}
-        placeholder="Ingredients (comma separated)"
-        className="w-full p-2 border rounded"
-        required
-      />
-      <textarea
-        name="instructions"
-        value={recipe.instructions}
-        onChange={handleChange}
-        placeholder="Instructions"
-        className="w-full p-2 border rounded"
-        required
-      />
-      <input
-        type="text"
-        name="cuisine"
-        value={recipe.cuisine}
-        onChange={handleChange}
-        placeholder="Cuisine"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        type="text"
-        name="difficulty"
-        value={recipe.difficulty}
-        onChange={handleChange}
-        placeholder="Difficulty (Easy, Medium, Hard)"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        type="number"
-        name="cookingTime"
-        value={recipe.cookingTime}
-        onChange={handleChange}
-        placeholder="Cooking Time (minutes)"
-        className="w-full p-2 border rounded"
-        required
-      />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setFile(e.target.files[0])}
-        className="w-full p-2 border rounded"
-      />
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-2xl mx-auto p-8 bg-white shadow-xl rounded-xl"
+    >
+      <h2 className="text-4xl font-bold text-center text-gray-800 mb-8">
+        Share Your Recipe
+      </h2>
+
+      <div className="space-y-6">
+        {/* Title */}
+        <div className="flex flex-col">
+          <label htmlFor="title" className="text-lg font-semibold text-gray-700">
+            Recipe Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            value={recipe.title}
+            onChange={handleChange}
+            placeholder="Enter the recipe title"
+            className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            required
+          />
+        </div>
+
+        {/* Ingredients */}
+        <div className="flex flex-col">
+          <label htmlFor="ingredients" className="text-lg font-semibold text-gray-700">
+            Ingredients (comma separated)
+          </label>
+          <input
+            type="text"
+            name="ingredients"
+            id="ingredients"
+            value={recipe.ingredients}
+            onChange={handleChange}
+            placeholder="List of ingredients"
+            className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            required
+          />
+        </div>
+
+        {/* Instructions */}
+        <div className="flex flex-col">
+          <label htmlFor="instructions" className="text-lg font-semibold text-gray-700">
+            Instructions
+          </label>
+          <textarea
+            name="instructions"
+            id="instructions"
+            value={recipe.instructions}
+            onChange={handleChange}
+            placeholder="Step-by-step instructions"
+            className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            required
+          />
+        </div>
+
+        {/* Cuisine and Difficulty */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="flex flex-col">
+            <label htmlFor="cuisine" className="text-lg font-semibold text-gray-700">
+              Cuisine Type
+            </label>
+            <input
+              type="text"
+              name="cuisine"
+              id="cuisine"
+              value={recipe.cuisine}
+              onChange={handleChange}
+              placeholder="E.g., Italian, Asian"
+              className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="difficulty" className="text-lg font-semibold text-gray-700">
+              Difficulty Level
+            </label>
+            <input
+              type="text"
+              name="difficulty"
+              id="difficulty"
+              value={recipe.difficulty}
+              onChange={handleChange}
+              placeholder="E.g., Easy, Medium, Hard"
+              className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Cooking Time */}
+        <div className="flex flex-col">
+          <label htmlFor="cookingTime" className="text-lg font-semibold text-gray-700">
+            Cooking Time (in minutes)
+          </label>
+          <input
+            type="number"
+            name="cookingTime"
+            id="cookingTime"
+            value={recipe.cookingTime}
+            onChange={handleChange}
+            placeholder="How long will it take?"
+            className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            required
+          />
+        </div>
+
+        {/* Image Upload */}
+        <div className="flex flex-col">
+          <label htmlFor="file" className="text-lg font-semibold text-gray-700">
+            Upload Recipe Image (optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            name="file"
+            id="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="w-full p-4 mt-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Submit Button */}
       <button
         type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        className="w-full p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 mt-6"
         disabled={loading}
       >
         {loading ? "Uploading..." : "Submit Recipe"}
