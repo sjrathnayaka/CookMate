@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+/* Add to App.css */
+.main-nav {
+  background-color: #E86A57;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: white;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: #FFB400;
+}
