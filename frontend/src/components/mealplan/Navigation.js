@@ -8,7 +8,6 @@ const Navigation = () => {
       <div className="nav-links">
         <Link to="/">Home</Link>
         <Link to="/meal-plans">Meal Plans</Link>
-        {/* Add other navigation links as needed */}
       </div>
     </nav>
   );
