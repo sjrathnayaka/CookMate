@@ -1,7 +1,8 @@
 package com.cookmate.backend.config;
 
 import java.util.List;
-
+import com.cookmate.backend.repository.UserRepository;
+import com.cookmate.backend.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.*;
@@ -33,15 +34,40 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+        http
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth2 -> oauth2
+            .authorizationEndpoint(authz -> authz.baseUri("/oauth2/authorize"))
+            .redirectionEndpoint(redir -> redir.baseUri("/oauth2/callback/*"))
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(customOAuth2UserService())
+            )
+            .successHandler(oAuth2SuccessHandler())
+        )
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+    }
+
+    @Bean
+    public CustomOAuth2UserService customOAuth2UserService() {
+    return new CustomOAuth2UserService();
+    }
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
+    return new OAuth2SuccessHandler(jwtUtil, userRepository);
     }
 
     @Bean
