@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
+import React from 'react'; 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
+import MealPlansPage from './pages/MealPlansPage';
+import Navigation from './components/mealplan/Navigation';
+import HomePage from './pages/HomePage';
+import './App.css'; 
+ 
+function App() { 
+  const currentUser = { 
+    id: '123' // Replace with actual user ID 
+  }; 
+ 
+  return ( 
+    <Router> 
+      <div className="App"> 
+        <Navigation />
+        <main className="main-content"> 
+          <Routes> 
+            <Route path="/" element={<HomePage />} /> 
+            <Route path="/meal-plans" element={<MealPlansPage userId={currentUser.id} />} /> 
+            {/* Redirect any unknown routes to home */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes> 
+        </main> 
+      </div> 
+    </Router> 
+  ); 
+} 
+ 
 export default App;
