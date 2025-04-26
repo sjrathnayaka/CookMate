@@ -2,101 +2,110 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8081/api/meal-plans';
 
-// Enhanced with error handling and logging
-const createMealPlan = async (userId, mealPlanData) => {
-  try {
+// Create axios instance with default headers
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add token to every request
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId');
+  
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  if (userId) {
+    config.headers['userId'] = userId;
+  }
+  
+  return config;
+});
+
+const mealPlanService = {
+  createMealPlan: async (mealPlanData) => {
     console.log('Sending meal plan data:', mealPlanData);
-    const response = await axios.post(API_URL, mealPlanData, {
-      headers: { 
-        'userId': userId,
-        'Content-Type': 'application/json'
+    try {
+      // Make sure userId is set in the meal plan data
+      if (!mealPlanData.userId) {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          mealPlanData.userId = userId;
+        }
       }
-    });
-    console.log('Create meal plan response:', response);
-    return response;
-  } catch (error) {
-    console.error('Error creating meal plan:', error.response || error);
-    throw error;
+      const response = await apiClient.post('', mealPlanData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating meal plan:', error);
+      throw error;
+    }
+  },
+  
+  getUserMealPlans: async (userId) => {
+    try {
+      const response = await apiClient.get(`/user/${userId}`);
+      return response.data; // Return just the data, not wrapped in {data: ...}
+    } catch (error) {
+      console.error('Error fetching user meal plans:', error);
+      throw error;
+    }
+  },
+  
+  getAllMealPlans: async () => {
+    try {
+      const response = await apiClient.get('/all');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all meal plans:', error);
+      throw error;
+    }
+  },
+  
+  getMealPlanById: async (mealPlanId) => {
+    try {
+      const response = await apiClient.get(`/${mealPlanId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching meal plan with id ${mealPlanId}:`, error);
+      throw error;
+    }
+  },
+  
+  updateMealPlan: async (mealPlanId, mealPlanData) => {
+    try {
+      const response = await apiClient.put(`/${mealPlanId}`, mealPlanData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating meal plan with id ${mealPlanId}:`, error);
+      throw error;
+    }
+  },
+  
+  deleteMealPlan: async (mealPlanId) => {
+    try {
+      await apiClient.delete(`/${mealPlanId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting meal plan with id ${mealPlanId}:`, error);
+      throw error;
+    }
+  },
+  
+  markRecipeAsTried: async (mealPlanId, recipeId, feedback = '') => {
+    try {
+      const response = await apiClient.patch(
+        `/${mealPlanId}/mark-tried?recipeId=${recipeId}&feedback=${encodeURIComponent(feedback)}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error marking recipe as tried:`, error);
+      throw error;
+    }
   }
 };
 
-const getUserMealPlans = async (userId) => {
-  try {
-    const response = await axios.get(`${API_URL}/user/${userId}`);
-    return response;
-  } catch (error) {
-    console.error('Error getting meal plans:', error);
-    throw error;
-  }
-};
-
-// Implement the missing getMealPlanById function
-const getMealPlanById = async (userId, mealPlanId) => {
-  try {
-    const response = await axios.get(`${API_URL}/${mealPlanId}`, {
-      headers: { 
-        'userId': userId,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Error getting meal plan:', error);
-    throw error;
-  }
-};
-
-const updateMealPlan = async (userId, mealPlanId, mealPlanData) => {
-  try {
-    const response = await axios.put(`${API_URL}/${mealPlanId}`, mealPlanData, {
-      headers: { 
-        'userId': userId,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Error updating meal plan:', error);
-    throw error;
-  }
-};
-
-const deleteMealPlan = async (userId, mealPlanId) => {
-  try {
-    const response = await axios.delete(`${API_URL}/${mealPlanId}`, {
-      headers: { 
-        'userId': userId,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Error deleting meal plan:', error);
-    throw error;
-  }
-};
-
-const markRecipeAsTried = async (userId, mealPlanId, recipeId, feedback) => {
-  try {
-    const response = await axios.patch(`${API_URL}/${mealPlanId}/mark-tried`, null, {
-      params: { recipeId, feedback },
-      headers: { 
-        'userId': userId,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response;
-  } catch (error) {
-    console.error('Error marking recipe as tried:', error);
-    throw error;
-  }
-};
-
-export default {
-  createMealPlan,
-  getUserMealPlans,
-  getMealPlanById,
-  updateMealPlan,
-  deleteMealPlan,
-  markRecipeAsTried
-};
+export default mealPlanService;

@@ -1,119 +1,109 @@
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import '../../styles/mealplan.css';
 
 const MealPlanForm = ({ onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const today = new Date().toISOString().split('T')[0];
+  const oneWeekLater = new Date();
+  oneWeekLater.setDate(oneWeekLater.getDate() + 6);
+  const endDate = oneWeekLater.toISOString().split('T')[0];
+
+  const [mealPlan, setMealPlan] = useState({
     name: '',
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000) // Default 7-day plan
+    startDate: today,
+    endDate: endDate,
+    dayPlans: [] // This will be generated when submitting
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleDateChange = (date, field) => {
-    setFormData({ ...formData, [field]: date });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-    
-    try {
-      const mealPlanPayload = {
-        ...formData,
-        startDate: formData.startDate.toISOString().split('T')[0],
-        endDate: formData.endDate.toISOString().split('T')[0],
-        dayPlans: generateDayPlans(formData.startDate, formData.endDate)
-      };
-      
-      console.log('Submitting meal plan:', mealPlanPayload); // Debug log
-      await onSubmit(mealPlanPayload);
-    } catch (err) {
-      console.error('Submission failed:', err);
-      setError(err.message || 'Failed to create meal plan');
-    } finally {
-      setIsSubmitting(false);
-    }
+    const { name, value } = e.target;
+    setMealPlan({
+      ...mealPlan,
+      [name]: value
+    });
   };
 
   const generateDayPlans = (startDate, endDate) => {
-    const days = [];
-    let currentDate = new Date(startDate);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const dayPlans = [];
     
-    while (currentDate <= endDate) {
-      days.push({
-        date: currentDate.toISOString().split('T')[0],
+    let currentDate = new Date(start);
+    
+    while (currentDate <= end) {
+      dayPlans.push({
+        date: new Date(currentDate).toISOString().split('T')[0],
         mealSlots: [
-          { mealType: 'Breakfast', recipeId: null, tried: false },
-          { mealType: 'Lunch', recipeId: null, tried: false },
-          { mealType: 'Dinner', recipeId: null, tried: false }
+          { mealType: 'BREAKFAST', recipeId: null, tried: false },
+          { mealType: 'LUNCH', recipeId: null, tried: false },
+          { mealType: 'DINNER', recipeId: null, tried: false }
         ]
       });
+      
       currentDate.setDate(currentDate.getDate() + 1);
     }
     
-    return days;
+    return dayPlans;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Submitting meal plan:', mealPlan);
+    
+    // Generate day plans based on date range
+    const dayPlans = generateDayPlans(mealPlan.startDate, mealPlan.endDate);
+    
+    // Call the onSubmit callback with the complete meal plan data
+    onSubmit({
+      ...mealPlan,
+      dayPlans: dayPlans
+    });
   };
 
   return (
-    <div className="meal-plan-form">
+    <div className="meal-plan-form-container">
       <h3>Create New Meal Plan</h3>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="meal-plan-form">
         <div className="form-group">
-          <label>Plan Name</label>
+          <label htmlFor="name">Plan Name</label>
           <input
             type="text"
+            id="name"
             name="name"
-            value={formData.name}
+            value={mealPlan.name}
             onChange={handleChange}
             required
-            disabled={isSubmitting}
+            placeholder="Enter plan name"
           />
         </div>
         
         <div className="form-group">
-          <label>Start Date</label>
-          <DatePicker
-            selected={formData.startDate}
-            onChange={(date) => handleDateChange(date, 'startDate')}
-            minDate={new Date()}
+          <label htmlFor="startDate">Start Date</label>
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            value={mealPlan.startDate}
+            onChange={handleChange}
             required
-            disabled={isSubmitting}
           />
         </div>
         
         <div className="form-group">
-          <label>End Date</label>
-          <DatePicker
-            selected={formData.endDate}
-            onChange={(date) => handleDateChange(date, 'endDate')}
-            minDate={formData.startDate}
+          <label htmlFor="endDate">End Date</label>
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            value={mealPlan.endDate}
+            onChange={handleChange}
             required
-            disabled={isSubmitting}
+            min={mealPlan.startDate}
           />
         </div>
         
-        <div className="form-actions">
-          <button 
-            type="button" 
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Creating...' : 'Create Plan'}
-          </button>
+        <div className="form-buttons">
+          <button type="submit" className="submit-button">Create Plan</button>
+          <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
         </div>
       </form>
     </div>

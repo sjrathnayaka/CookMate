@@ -32,6 +32,12 @@ public class MealPlanServiceImpl implements MealPlanService {
     }
 
     @Override
+public List<MealPlan> getAllMealPlans() {
+    return mealPlanRepository.findAll();
+}
+
+    
+    @Override
     public MealPlan getMealPlanById(String userId, String mealPlanId) {
         return mealPlanRepository.findById(mealPlanId)
                 .filter(plan -> plan.getUserId().equals(userId))

@@ -5,6 +5,8 @@ import java.util.List;
 public interface MealPlanService {
     MealPlan createMealPlan(MealPlan mealPlan);
     List<MealPlan> getUserMealPlans(String userId);
+    List<MealPlan> getAllMealPlans();
+
     MealPlan getMealPlanById(String userId, String mealPlanId);
     MealPlan updateMealPlan(String userId, MealPlan mealPlan);
     void deleteMealPlan(String userId, String mealPlanId);

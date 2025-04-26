@@ -19,7 +19,13 @@ public class MealPlanController {
     }
 
     @PostMapping
-    public ResponseEntity<MealPlan> createMealPlan(@RequestBody MealPlan mealPlan) {
+    public ResponseEntity<MealPlan> createMealPlan(
+            @RequestHeader(value = "userId", required = false) String userId,
+            @RequestBody MealPlan mealPlan) {
+        // Make sure meal plan has a user ID
+        if (userId != null && (mealPlan.getUserId() == null || mealPlan.getUserId().isEmpty())) {
+            mealPlan.setUserId(userId);
+        }
         return ResponseEntity.ok(mealPlanService.createMealPlan(mealPlan));
     }
 
@@ -30,14 +36,19 @@ public class MealPlanController {
 
     @GetMapping("/{mealPlanId}")
     public ResponseEntity<MealPlan> getMealPlanById(
-            @RequestHeader("userId") String userId,
+            @RequestHeader(value = "userId", required = false) String userId,
             @PathVariable String mealPlanId) {
         return ResponseEntity.ok(mealPlanService.getMealPlanById(userId, mealPlanId));
     }
 
+    @GetMapping("/all")
+    public List<MealPlan> getAllMealPlans() {
+        return mealPlanService.getAllMealPlans();
+    }
+    
     @PutMapping("/{mealPlanId}")
     public ResponseEntity<MealPlan> updateMealPlan(
-            @RequestHeader("userId") String userId,
+            @RequestHeader(value = "userId", required = false) String userId,
             @PathVariable String mealPlanId,
             @RequestBody MealPlan mealPlan) {
         mealPlan.setId(mealPlanId);
@@ -46,7 +57,7 @@ public class MealPlanController {
 
     @DeleteMapping("/{mealPlanId}")
     public ResponseEntity<Void> deleteMealPlan(
-            @RequestHeader("userId") String userId,
+            @RequestHeader(value = "userId", required = false) String userId,
             @PathVariable String mealPlanId) {
         mealPlanService.deleteMealPlan(userId, mealPlanId);
         return ResponseEntity.noContent().build();
@@ -54,7 +65,7 @@ public class MealPlanController {
 
     @PatchMapping("/{mealPlanId}/mark-tried")
     public ResponseEntity<MealPlan> markRecipeAsTried(
-            @RequestHeader("userId") String userId,
+            @RequestHeader(value = "userId", required = false) String userId,
             @PathVariable String mealPlanId,
             @RequestParam String recipeId,
             @RequestParam(required = false) String feedback) {

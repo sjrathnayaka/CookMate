@@ -9,8 +9,8 @@ const MealPlansPage = ({ userId }) => {
   const [mealPlans, setMealPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);  // Loading state
-  const [error, setError] = useState(null);  // Error state
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (userId) {
@@ -19,34 +19,51 @@ const MealPlansPage = ({ userId }) => {
   }, [userId]);
 
   const fetchMealPlans = async () => {
-    setIsLoading(true);  // Set loading state before fetching
-    setError(null);  // Reset error state
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await mealPlanService.getUserMealPlans(userId);
-      setMealPlans(response.data);
+      const data = await mealPlanService.getUserMealPlans(userId);
+      // Ensure we always have an array even if the API returns nothing
+      setMealPlans(Array.isArray(data) ? data : []);
     } catch (error) {
       setError('Error fetching meal plans. Please try again later.');
       console.error('Error fetching meal plans:', error);
+      // Set mealPlans to empty array on error
+      setMealPlans([]);
     } finally {
-      setIsLoading(false);  // Reset loading state
+      setIsLoading(false);
     }
   };
 
   const handleCreate = async (mealPlanData) => {
     try {
-      await mealPlanService.createMealPlan(userId, mealPlanData);
+      // Make sure the meal plan has the user ID
+      if (!mealPlanData.userId) {
+        mealPlanData.userId = userId;
+      }
+      await mealPlanService.createMealPlan(mealPlanData);
       await fetchMealPlans();
       setIsCreating(false);
     } catch (error) {
       console.error('Error creating meal plan:', error);
+      setError('Error creating meal plan. Please try again.');
     }
   };
 
-  const handleSelectPlan = async (plan) => {
+  const handleSelectPlan = (plan) => {
+    setSelectedPlan(plan);
+  };
+
+  const handleDeletePlan = async (planId) => {
     try {
-      setSelectedPlan(plan);
+      await mealPlanService.deleteMealPlan(planId);
+      await fetchMealPlans();
+      if (selectedPlan && selectedPlan.id === planId) {
+        setSelectedPlan(null);
+      }
     } catch (error) {
-      console.error('Error selecting meal plan:', error);
+      console.error('Error deleting meal plan:', error);
+      setError('Error deleting meal plan. Please try again.');
     }
   };
 
@@ -73,8 +90,9 @@ const MealPlansPage = ({ userId }) => {
         <p>{error}</p>
       ) : (
         <MealPlanList 
-          mealPlans={mealPlans}
+          mealPlans={mealPlans} // This is now guaranteed to be an array
           onSelect={handleSelectPlan}
+          onDelete={handleDeletePlan}
         />
       )}
 
