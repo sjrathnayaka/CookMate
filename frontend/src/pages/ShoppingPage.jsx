@@ -1,18 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateShoppingList } from '../services/shoppingService';
-import RecipeSelector from '../components/shopping/RecipeSelector';
+import RecipeSelector from '../components/mealplan/RecipeSelector';
+import '../styles/shopping.css';
 
 const ShoppingPage = () => {
   const [recipeIds, setRecipeIds] = useState([]);
   const navigate = useNavigate();
 
   const fetchList = async () => {
-    const list = await generateShoppingList(recipeIds);
-    navigate('/shopping/generated', { state: { shoppingList: list } });
+    try {
+      const list = await generateShoppingList(recipeIds);
+      navigate('/shopping/generated', { state: { shoppingList: list } });
+    } catch (err) {
+      console.error('Error generating shopping list:', err);
+    }
   };
 
   return (
+    <div className="shopping-page-container">
+      <div className="content-wrapper">
+        <h1 className="page-title">Shopping List Generator</h1>
+        
+        <div className="feature-description">
+          Select recipes to include in your shopping list
+        </div>
+        
+        <RecipeSelector selectedIds={recipeIds} onChange={setRecipeIds} />
+        
+        <div className="button-container">
+          <button 
+            onClick={fetchList} 
+            disabled={recipeIds.length === 0}
+            className={`generate-button ${recipeIds.length === 0 ? 'disabled' : ''}`}
+          >
+            Generate Shopping List
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+  /*return (
     <div>
       <h1>Shopping List Generator</h1>
       <RecipeSelector selectedIds={recipeIds} onChange={setRecipeIds} />
@@ -21,35 +51,6 @@ const ShoppingPage = () => {
       </button>
     </div>
   );
-};
+};*/
 
 export default ShoppingPage;
-
-
-
-/*
-//before
-import React, { useState } from 'react';
-import { generateShoppingList } from '../services/shoppingService';
-import ShoppingList from '../components/shopping/ShoppingList';
-
-const ShoppingPage = () => {
-  const [recipeIds, setRecipeIds] = useState([]);
-  const [shoppingList, setShoppingList] = useState([]);
-
-  const fetchList = async () => {
-    const list = await generateShoppingList(recipeIds);
-    setShoppingList(list);
-  };
-
-  return (
-    <div>
-      <h1>Shopping List Generator</h1>
-      // Add a recipe selector component here 
-      <button onClick={fetchList}>Generate List</button>
-      {shoppingList.length > 0 && <ShoppingList list={shoppingList} />}
-    </div>
-  );
-};
-
-export default ShoppingPage;*/
