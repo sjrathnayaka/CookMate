@@ -62,6 +62,7 @@ const Navigation = () => {
             </button>
             {isProfileDropdownOpen && (
               <div className="profile-dropdown">
+                <Link to="/profile" className="dropdown-item">Profile</Link>
                 <Link to="/login" className="dropdown-item">Login</Link>
                 <Link to="/signup" className="dropdown-item">Sign Up</Link>
               </div>

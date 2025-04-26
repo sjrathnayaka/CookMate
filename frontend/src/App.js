@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import MealPlansPage from './pages/MealPlansPage';
 import Navigation from './components/mealplan/Navigation';
 import HomePage from './pages/HomePage';
+import UserProfile from './pages/UserProfile'; // ✅ import it
 import './App.css'; 
  
 function App() { 
   useEffect(() => {
-    // ⚠️ Temporary setup – set this only once
-    localStorage.setItem('token', 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpc2h1dGhhcmFueWFAZ21haWwuY29tIiwiZXhwIjoxNzQ1NjgyODcxfQ.jeHi3hVNSW7IuAwEVKdm6EoxfSr8vFhj_Vs9dGW3uIW4CrMIhUFYA6Cu5S5pd_FoxQ1pwX71GYJpSKWSJRUHUQ');  // paste full token here
-    localStorage.setItem('userId', '680baf52f95f7444ff432641'); // your real userId
+    localStorage.setItem('token', 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpc2h1dGhhcmFueWFAZ21haWwuY29tIiwiZXhwIjoxNzQ1NjgyODcxfQ.jeHi3hVNSW7IuAwEVKdm6EoxfSr8vFhj_Vs9dGW3uIW4CrMIhUFYA6Cu5S5pd_FoxQ1pwX71GYJpSKWSJRUHUQ');  
+    localStorage.setItem('userId', '680baf52f95f7444ff432641');
   }, []);
 
   const currentUser = { 
@@ -24,6 +24,7 @@ function App() {
           <Routes> 
             <Route path="/" element={<HomePage />} /> 
             <Route path="/meal-plans" element={<MealPlansPage userId={currentUser.id} />} /> 
+            <Route path="/profile" element={<UserProfile />} /> {/* ✅ add this route */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes> 
         </main> 
