@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaUtensils, FaSearch, FaCalendarAlt, FaShoppingBasket, FaUsers, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
+import { FaUtensils, FaSearch, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
 import '../../styles/CookMate.css';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
+
   const toggleProfileDropdown = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
-  
+
   return (
     <nav className="main-nav">
       <div className="nav-container">
         <div className="brand-section">
           <Link to="/" className="nav-logo">
-            <FaUtensils className="logo-icon" /> CookMate
+            <FaUtensils className="logo-icon" /> 
+            <span>CookMate</span>
           </Link>
         </div>
-        
+
         <div className="mobile-menu-button" onClick={toggleMenu}>
           {isMenuOpen ? <FaTimes /> : <FaBars />}
         </div>
         
         <div className={`nav-links ${isMenuOpen ? 'show' : ''}`}>
           <Link to="/community" className="nav-link nav-link-highlight">
-            <FaUsers className="nav-icon" />
             <span className="nav-text">Community</span>
           </Link>
           <Link to="/" className="nav-link">
