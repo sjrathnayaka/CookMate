@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import MealPlansPage from './pages/MealPlansPage';
 import ShoppingListPage from './pages/ShoppingPage';
+import GeneratedShoppingListPage from './pages/GeneratedShoppingListPage';
 import Navigation from './components/mealplan/Navigation';
 import HomePage from './pages/HomePage';
 import './App.css'; 
@@ -19,7 +20,8 @@ function App() {
           <Routes> 
             <Route path="/" element={<HomePage />} /> 
             <Route path="/meal-plans" element={<MealPlansPage userId={currentUser.id} />} /> 
-            <Route path="/shopping" element={<ShoppingListPage userId={currentUser.id} />} /> 
+            <Route path="/shopping" element={<ShoppingListPage />} /> 
+            <Route path="/shopping/generated" element={<GeneratedShoppingListPage />} />
             {/* Redirect any unknown routes to home */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes> 
