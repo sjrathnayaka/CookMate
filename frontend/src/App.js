@@ -1,8 +1,8 @@
 import React from 'react'; 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import MealPlansPage from './pages/MealPlansPage';
 import Navigation from './components/mealplan/Navigation';
-import HomePage from './pages/HomePage'; // You'll need to create this
+import HomePage from './pages/HomePage';
 import './App.css'; 
  
 function App() { 
@@ -13,17 +13,13 @@ function App() {
   return ( 
     <Router> 
       <div className="App"> 
-        <Navigation /> {/* Add the Navigation component back */}
+        <Navigation />
         <main className="main-content"> 
           <Routes> 
-            <Route  
-              path="/meal-plans"  
-              element={<MealPlansPage userId={currentUser.id} />}  
-            /> 
-            <Route  
-              path="/"  
-              element={<HomePage />}  
-            /> 
+            <Route path="/" element={<HomePage />} /> 
+            <Route path="/meal-plans" element={<MealPlansPage userId={currentUser.id} />} /> 
+            {/* Redirect any unknown routes to home */}
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes> 
         </main> 
       </div> 
